@@ -1,0 +1,47 @@
+project: sandbox
+
+containers:
+  - name: app
+    dockerfile: app/Dockerfile
+  
+  - name: db
+    image: postgres:15-alpine
+    volumes:
+      - type: host_path
+        source: /Users/megancase/Projects/personal/sandbox/db/init.sql
+        target: /docker-entrypoint-initdb.d/init.sql
+        read_only: true
+    env:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      POSTGRES_DB: toy_db
+
+services:
+  - name: app
+    container: app
+    ports:
+      - name: http
+        port: 3000
+    env:
+      # efficient-dispatch: relay usually runs containers on a bridge or host.
+      # For a single worker, we'll try 'localhost' assuming host networking or simple port mapping.
+      # If they are isolated, we might need to rely on Docker DNS or IP.
+      DATABASE_URL: postgres://user:password@host.docker.internal:5434/toy_db
+  
+  - name: db
+    container: db
+    ports:
+      - name: pg
+        port: 5432
+
+deploys:
+  - name: dev
+    services:
+      - service: app
+        host: sandbox.local
+        port: 3001
+        target: http
+      - service: db
+        host: sandbox-db.local
+        port: 5434
+        target: pg

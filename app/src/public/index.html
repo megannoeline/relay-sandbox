@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charac-ters</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        input {
+            padding: 0.5rem;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 0.5rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .power {
+            color: #666;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Characterssssssss!!!</h1>
+
+    <div style="margin-bottom: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 8px;">
+        <h2>Add Character</h2>
+        <form id="add-form">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" id="name" required placeholder="e.g. Goku">
+            </div>
+            <div class="form-group">
+                <label for="power">Power Level</label>
+                <input type="number" id="power" required placeholder="e.g. 9001">
+            </div>
+            <button type="submit">Add Character</button>
+        </form>
+    </div>
+
+    <h2>Roster</h2>
+    <ul id="char-list">
+        <li>Loading...</li>
+    </ul>
+
+    <script>
+        const form = document.getElementById('add-form');
+        const list = document.getElementById('char-list');
+
+        async function loadCharacters() {
+            try {
+                const res = await fetch('/api/characters');
+                const data = await res.json();
+                renderList(data);
+            } catch (e) {
+                list.innerHTML = '<li>Error loading characters</li>';
+                console.error(e);
+            }
+        }
+
+        function renderList(chars) {
+            list.innerHTML = chars.length ? '' : '<li>No characters yet</li>';
+            chars.forEach(char => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${char.name}</span> <span class="power">Level: ${char.power_level}</span>`;
+                list.appendChild(li);
+            });
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const power_level = parseInt(document.getElementById('power').value);
+
+            try {
+                const res = await fetch('/api/characters', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, power_level })
+                });
+
+                if (res.ok) {
+                    form.reset();
+                    loadCharacters();
+                } else {
+                    alert('Failed to add character');
+                }
+            } catch (e) {
+                alert('Error submitting form');
+                console.error(e);
+            }
+        });
+
+        // Initial load
+        loadCharacters();
+    </script>
+</body>
+
+</html>

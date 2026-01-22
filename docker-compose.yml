@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # --- Service 1: The Bun Application ---
+  app:
+    # Build the image from the Dockerfile in the ./app directory
+    build: ./app
+
+    # Map port 3000 on your computer to port 3000 inside the container
+    ports:
+      - "3000:3000"
+
+    # Environment variables accessible inside the code (process.env.DATABASE_URL)
+    environment:
+      # NOTE: "db" here refers to the service name below, NOT "localhost".
+      # Inside Docker networks, services resolve by their name.
+      - DATABASE_URL=postgres://user:password@db:5432/toy_db
+
+    # Wait for the database to start before starting the app
+    depends_on:
+      - db
+
+    # Restart automatically if it crashes
+    restart: always
+
+  # --- Service 2: The Postgres Database ---
+  db:
+    # Build from ./db (which copies our init.sql)
+    build: ./db
+
+    # Default Postgres credentials
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=toy_db
+
+    # Map port 5433 on your computer to 5432 inside.
+    # We use 5433 externally to avoid conflicts if you have Postgres running locally.
+    ports:
+      - "5433:5432"
+
+    # Persist data so it survives restarts
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+    restart: always
+
+# Define the volume for database persistence
+volumes:
+  db_data:

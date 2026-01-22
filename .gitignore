@@ -1,0 +1,10 @@
+repos/
+*.log
+__pycache__/
+*.pyc
+*.db
+*.db-shm
+*.db-wal
+debug_db.py
+fix_jobs.py
+test_docker.py

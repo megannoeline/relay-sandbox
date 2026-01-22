@@ -1,0 +1,11 @@
+{
+  "name": "bun-toy-app",
+  "module": "src/index.ts",
+  "type": "module",
+  "dependencies": {
+    "postgres": "^3.4.5"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  }
+}
