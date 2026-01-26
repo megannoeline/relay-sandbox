@@ -25,8 +25,9 @@ def register_project(path):
     payload = {
         "id": "sandbox",
         "source": {
-            "type": "dir",
-            "path": abs_path
+            "type": "git",
+            "repo": "https://github.com/megannoeline/relay-sandbox.git",
+            "branch": "main"
         }
     }
     try:

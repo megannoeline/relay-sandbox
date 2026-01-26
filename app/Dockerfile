@@ -3,13 +3,12 @@ FROM oven/bun:latest
 WORKDIR /app
 
 # Copy package files
-COPY package.json ./
-
+COPY app/package.json ./
 # Install dependencies
 RUN bun install
 
 # Copy source code
-COPY src ./src
+COPY app/src ./src
 
 # Expose port
 EXPOSE 3000

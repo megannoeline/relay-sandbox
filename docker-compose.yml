@@ -4,7 +4,10 @@ services:
   # --- Service 1: The Bun Application ---
   app:
     # Build the image from the Dockerfile in the ./app directory
-    build: ./app
+    # Build the image from the Dockerfile in the ./app directory
+    build:
+      context: .
+      dockerfile: app/Dockerfile
 
     # Map port 3000 on your computer to port 3000 inside the container
     ports:
@@ -30,7 +33,10 @@ services:
   # --- Service 2: The Postgres Database ---
   db:
     # Build from ./db (which copies our init.sql)
-    build: ./db
+    # Build from ./db (which copies our init.sql)
+    build:
+      context: .
+      dockerfile: db/Dockerfile
 
     # Default Postgres credentials
     environment:
