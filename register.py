@@ -19,16 +19,12 @@ def register_project(path):
     client = get_client()
     if not client: return
 
-    abs_path = os.path.abspath(path)
-    print(f"Registering project from: {abs_path}")
+    print(f"Registering project: sandbox")
     
     payload = {
         "id": "sandbox",
-        "source": {
-            "type": "git",
-            "repo": "https://github.com/megannoeline/relay-sandbox.git",
-            "branch": "main"
-        }
+        "repo": "https://github.com/megannoeline/relay-sandbox.git",
+        "branch": "main"
     }
     try:
         res = client.post("/v1/projects", payload)
@@ -44,7 +40,7 @@ def trigger_deploy(deploy_id):
     payload = {
         "deploy": deploy_id,
         "force": False,
-        "branch": "local" 
+        "branch": "main" 
     }
     try:
         res = client.post("/v1/deploys/apply", payload)
