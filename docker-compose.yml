@@ -23,6 +23,10 @@ services:
     # Restart automatically if it crashes
     restart: always
 
+    # Mount source code for live updates
+    volumes:
+      - ./app/src:/app/src
+
   # --- Service 2: The Postgres Database ---
   db:
     # Build from ./db (which copies our init.sql)

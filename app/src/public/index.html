@@ -4,140 +4,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charac-ters</title>
+    <title>NEON HOOPS 2.0</title>
     <style>
         body {
-            font-family: sans-serif;
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Impact', sans-serif;
+            user-select: none;
         }
 
-        h1 {
-            color: #333;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        label {
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
             display: block;
-            margin-bottom: 0.5rem;
         }
 
-        input {
-            padding: 0.5rem;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        button {
-            padding: 0.5rem 1rem;
-            cursor: pointer;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-        }
-
-        button:hover {
-            background: #0056b3;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        li {
-            padding: 0.5rem;
-            border-bottom: 1px solid #eee;
+        /* Power Meter */
+        #power-container {
+            position: absolute;
+            top: 50%;
+            right: 50px;
+            width: 30px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #fff;
+            border-radius: 15px;
+            transform: translateY(-50%);
             display: flex;
-            justify-content: space-between;
+            flex-direction: column-reverse;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
         }
 
-        .power {
-            color: #666;
+        #power-fill {
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, #00ff00, #ffff00, #ff0000);
+            border-radius: 13px;
+            transition: height 0.05s;
+        }
+
+        #power-label {
+            position: absolute;
+            bottom: -30px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        /* Scoreboard */
+        #scoreboard {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 50px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 40px;
+            border: 4px solid #00ff00;
+            border-radius: 10px;
+            box-shadow: 0 0 20px #00ff00;
+        }
+
+        .score-box {
+            text-align: center;
+        }
+
+        .score-label {
+            color: #888;
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+
+        .score-val {
+            color: #00ff00;
+            font-size: 4rem;
+            text-shadow: 0 0 10px #00ff00;
+            font-family: 'Courier New', monospace;
             font-weight: bold;
         }
+
+        #timer-val {
+            color: #ff0055;
+            text-shadow: 0 0 10px #ff0055;
+        }
+
+        #instructions {
+            position: absolute;
+            bottom: 50px;
+            width: 100%;
+            text-align: center;
+            color: #fff;
+            opacity: 0.6;
+            font-size: 1.2rem;
+            text-shadow: 0 0 5px #000;
+        }
     </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+                "cannon-es": "https://unpkg.com/cannon-es@0.20.0/dist/cannon-es.js"
+            }
+        }
+    </script>
 </head>
 
 <body>
-    <h1>Characterssssssss</h1>
+    <div id="canvas-container"></div>
 
-    <div style="margin-bottom: 2rem; padding: 1rem; background: #f9f9f9; border-radius: 8px;">
-        <h2>Add Character</h2>
-        <form id="add-form">
-            <div class="form-group">
-                <label for="name">Name</label>
-                <input type="text" id="name" required placeholder="e.g. Goku">
-            </div>
-            <div class="form-group">
-                <label for="power">Power Level</label>
-                <input type="number" id="power" required placeholder="e.g. 9001">
-            </div>
-            <button type="submit">Add Character</button>
-        </form>
+    <div id="power-container">
+        <div id="power-fill"></div>
+        <div id="power-label">POWER</div>
     </div>
 
-    <h2>Roster</h2>
-    <ul id="char-list">
-        <li>Loading...</li>
-    </ul>
+    <div id="scoreboard">
+        <div class="score-box">
+            <div class="score-label">SCORE</div>
+            <div class="score-val" id="score">00</div>
+        </div>
+        <div class="score-box">
+            <div class="score-label">TIME</div>
+            <div class="score-val" id="timer-val">60</div>
+        </div>
+    </div>
 
-    <script>
-        const form = document.getElementById('add-form');
-        const list = document.getElementById('char-list');
+    <div id="instructions">HOLD [UP] TO CHARGE • RELEASE TO SHOOT</div>
 
-        async function loadCharacters() {
-            try {
-                const res = await fetch('/api/characters');
-                const data = await res.json();
-                renderList(data);
-            } catch (e) {
-                list.innerHTML = '<li>Error loading characters</li>';
-                console.error(e);
-            }
-        }
-
-        function renderList(chars) {
-            list.innerHTML = chars.length ? '' : '<li>No characters yet</li>';
-            chars.forEach(char => {
-                const li = document.createElement('li');
-                li.innerHTML = `<span>${char.name}</span> <span class="power">Level: ${char.power_level}</span>`;
-                list.appendChild(li);
-            });
-        }
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('name').value;
-            const power_level = parseInt(document.getElementById('power').value);
-
-            try {
-                const res = await fetch('/api/characters', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, power_level })
-                });
-
-                if (res.ok) {
-                    form.reset();
-                    loadCharacters();
-                } else {
-                    alert('Failed to add character');
-                }
-            } catch (e) {
-                alert('Error submitting form');
-                console.error(e);
-            }
-        });
-
-        // Initial load
-        loadCharacters();
-    </script>
+    <script type="module" src="script.js"></script>
 </body>
 
 </html>

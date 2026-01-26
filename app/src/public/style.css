@@ -1,0 +1,435 @@
+:root {
+    --bg-color: #050505;
+    --card-bg: rgba(20, 20, 25, 0.6);
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --accent-color: #00f3ff;
+    --accent-glow: rgba(0, 243, 255, 0.5);
+    --danger-color: #ff0055;
+    --danger-glow: rgba(255, 0, 85, 0.5);
+    --success-color: #00ff9d;
+    --font-heading: 'Inter', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    background-image:
+        radial-gradient(circle at 50% 0%, #1a1a2e 0%, transparent 70%),
+        linear-gradient(0deg, #050505 0%, #0a0a12 100%);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    margin: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+    perspective: 1000px;
+    user-select: none;
+    /* Prevent selection during smashing */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+h1 {
+    font-size: 4rem;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.5rem;
+    position: relative;
+    text-shadow: 0 0 10px var(--accent-glow);
+    margin-bottom: 3rem;
+    animation: glow-pulse 3s infinite;
+}
+
+@keyframes glow-pulse {
+
+    0%,
+    100% {
+        text-shadow: 0 0 20px var(--accent-glow), 0 0 40px var(--accent-color);
+    }
+
+    50% {
+        text-shadow: 0 0 10px var(--accent-glow), 0 0 20px var(--accent-color);
+    }
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+.char-card-wrap {
+    perspective: 1000px;
+}
+
+.char-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    transition: transform 0.1s ease, box-shadow 0.3s ease;
+    transform-style: preserve-3d;
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.char-card:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 30px var(--accent-glow);
+}
+
+.char-avatar {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1.5rem;
+    display: block;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.3);
+    transition: border-color 0.3s;
+}
+
+.char-card h3 {
+    text-align: center;
+    font-size: 1.8rem;
+    margin: 0 0 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.char-levels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.level-val {
+    color: var(--accent-color);
+    font-weight: 800;
+    font-size: 1.2rem;
+}
+
+.battle-fab {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--danger-color);
+    color: white;
+    border: none;
+    padding: 1.5rem 3rem;
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 0 30px var(--danger-glow);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 100;
+}
+
+.battle-fab:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 50px var(--danger-glow);
+}
+
+/* Battle Overlay */
+#battle-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(5, 5, 5, 0.95);
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s;
+    backdrop-filter: blur(20px);
+}
+
+#battle-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.battle-stage {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    /* Align bottom so jumps look right */
+    width: 90%;
+    max-width: 1000px;
+    position: relative;
+    height: 400px;
+}
+
+.fighter-container {
+    width: 300px;
+    position: relative;
+    transition: transform 0.1s;
+}
+
+.fighter-avatar {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 5px solid white;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    z-index: 2;
+    background: #000;
+}
+
+.p1 .fighter-avatar {
+    border-color: var(--accent-color);
+}
+
+.p2 .fighter-avatar {
+    border-color: var(--danger-color);
+}
+
+/* Combat Animations */
+@keyframes lunge-right {
+    0% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(100px) rotate(5deg);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes lunge-left {
+    0% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(-100px) rotate(-5deg);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+}
+
+@keyframes flash-red {
+    0% {
+        filter: brightness(1) sepia(0);
+    }
+
+    30% {
+        filter: brightness(2) sepia(1) hue-rotate(-50deg) saturate(5);
+    }
+
+    /* Red flash */
+    100% {
+        filter: brightness(1);
+    }
+}
+
+@keyframes shake-hard {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    25% {
+        transform: translate(-10px, 10px);
+    }
+
+    50% {
+        transform: translate(10px, -5px);
+    }
+
+    75% {
+        transform: translate(-5px, 5px);
+    }
+
+    100% {
+        transform: translate(0, 0);
+    }
+}
+
+.attacking.p1 {
+    animation: lunge-right 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.attacking.p2 {
+    animation: lunge-left 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.hit {
+    animation: shake-hard 0.3s;
+}
+
+.hit .fighter-avatar {
+    animation: flash-red 0.3s;
+}
+
+/* Block Shield */
+.shield {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    border: 4px solid #40f6ff;
+    border-radius: 50%;
+    box-shadow: 0 0 20px #40f6ff inset;
+    opacity: 0;
+    transition: opacity 0.1s;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.blocking .shield {
+    opacity: 1;
+}
+
+.health-bar-wrap {
+    width: 100%;
+    height: 15px;
+    background: #333;
+    margin-top: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.health-fill {
+    height: 100%;
+    background: var(--success-color);
+    width: 100%;
+    transition: width 0.2s ease-out;
+}
+
+.p2 .health-fill {
+    background: var(--danger-color);
+}
+
+.controls-hint {
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    opacity: 0.7;
+    font-size: 1.2rem;
+}
+
+.key {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid white;
+    border-radius: 4px;
+    margin: 0 0.2rem;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.damage-numbers {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    pointer-events: none;
+}
+
+.float-dmg {
+    position: absolute;
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: 900;
+    text-shadow: 0 0 10px red;
+    animation: floatUp 0.8s forwards;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translate(-50%, -50%) scale(0.5);
+        opacity: 1;
+    }
+
+    50% {
+        transform: translate(-50%, -150%) scale(1.5);
+    }
+
+    100% {
+        transform: translate(-50%, -200%) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Winner Overlay */
+.winner-announce {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+}
+
+.winner-announce h1 {
+    font-size: 6rem;
+    color: var(--accent-color);
+    margin: 0;
+}
+
+/* Form Styling */
+.summon-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 500px;
+    margin: 0 auto 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid #333;
+    color: white;
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.btn-summon {
+    background: var(--accent-color);
+    color: black;
+    font-weight: 800;
+    width: 100%;
+    padding: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    border: none;
+}

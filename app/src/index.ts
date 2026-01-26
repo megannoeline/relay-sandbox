@@ -1,6 +1,6 @@
 import postgres from 'postgres';
 
-const sql = postgres(process.env.DATABASE_URL || 'postgres://user:password@localhost:5433/toy_db');
+const sql = postgres(process.env.DATABASE_URL || 'postgres://user:password@localhost:5434/toy_db');
 
 const server = Bun.serve({
     port: 3000,
@@ -8,9 +8,18 @@ const server = Bun.serve({
         const url = new URL(req.url);
 
         // Serve Frontend
-        if (url.pathname === "/") {
-            const indexPath = new URL("public/index.html", import.meta.url).pathname; // Safe relative path
+        if (url.pathname === "/" || url.pathname === "/index.html") {
+            const indexPath = new URL("public/index.html", import.meta.url).pathname;
             return new Response(Bun.file(indexPath));
+        }
+
+        // Serve Static Files (CSS, JS)
+        if (url.pathname.endsWith(".css") || url.pathname.endsWith(".js")) {
+            const safePath = new URL(`public${url.pathname}`, import.meta.url).pathname;
+            const file = Bun.file(safePath);
+            if (await file.exists()) {
+                return new Response(file);
+            }
         }
 
         // Health Check
