@@ -3,13 +3,6 @@ project: sandbox
 containers:
   - name: app
     dockerfile: app/Dockerfile
-  
-  - name: db
-    dockerfile: db/Dockerfile
-    env:
-      POSTGRES_PASSWORD: password
-      POSTGRES_USER: user
-      POSTGRES_DB: toy_db
 
 services:
   - name: app
@@ -17,14 +10,6 @@ services:
     ports:
       - name: http
         port: 3000
-    env:
-      DATABASE_URL: postgres://user:password@localhost:5434/toy_db
-  
-  - name: db
-    container: db
-    ports:
-      - name: pg
-        port: 5432
 
 deploys:
   - name: dev
@@ -33,7 +18,3 @@ deploys:
         host: sandbox.hostbo.cx
         port: 80
         target: http
-      - service: db
-        host: sandbox-db.local
-        port: 5434
-        target: pg
