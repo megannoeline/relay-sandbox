@@ -18,7 +18,7 @@ services:
       - name: http
         port: 3000
     env:
-      DATABASE_URL: postgres://user:password@db:5432/toy_db
+      DATABASE_URL: postgres://user:password@sandbox-db.hostbo.cx:5434/toy_db
   
   - name: db
     container: db
