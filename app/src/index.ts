@@ -11,7 +11,11 @@ const server = Bun.serve({
         // Serve Frontend
         if (url.pathname === "/" || url.pathname === "/index.html") {
             const indexPath = new URL("public/index.html", import.meta.url).pathname;
-            return new Response(Bun.file(indexPath));
+            return new Response(Bun.file(indexPath), {
+                headers: {
+                    "Content-Type": "text/html",
+                },
+            });
         }
 
         // Serve Static Files (CSS, JS)
