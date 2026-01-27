@@ -1,6 +1,11 @@
 import postgres from 'postgres';
 
+import { initDB } from './db_init';
+
 const sql = postgres(process.env.DATABASE_URL || 'postgres://user:password@localhost:5434/toy_db');
+
+// Initialize DB on startup
+await initDB(sql);
 
 const server = Bun.serve({
     port: 3000,

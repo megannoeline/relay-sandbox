@@ -5,7 +5,7 @@ containers:
     dockerfile: app/Dockerfile
   
   - name: db
-    dockerfile: db/Dockerfile
+    image: postgres:15-alpine
     env:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: user
