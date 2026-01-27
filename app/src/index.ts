@@ -4,6 +4,7 @@ const sql = postgres(process.env.DATABASE_URL || 'postgres://user:password@local
 
 const server = Bun.serve({
     port: 3000,
+    hostname: "0.0.0.0",
     async fetch(req) {
         const url = new URL(req.url);
 
@@ -60,5 +61,3 @@ const server = Bun.serve({
         return new Response("Not Found", { status: 404 });
     },
 });
-
-console.log(`🏀 NEON HOOPS 2.0 running on http://localhost:${server.port}`);
