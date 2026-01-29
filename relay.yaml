@@ -3,7 +3,7 @@ project: sandbox
 containers:
   - name: app
     dockerfile: app/Dockerfile
-  
+
   - name: db
     image: postgres:15-alpine
     env:
@@ -18,8 +18,8 @@ services:
       - name: http
         port: 3000
     env:
-      DATABASE_URL: postgres://user:password@172.17.0.1:9001/toy_db
-  
+      DATABASE_URL: postgres://user:password@sandbox-db.relay:5432/toy_db
+
   - name: db
     container: db
     env:
@@ -29,6 +29,7 @@ services:
     ports:
       - name: pg
         port: 5432
+        proto: tcp
 
 deploys:
   - name: dev
@@ -38,6 +39,7 @@ deploys:
         port: 443
         target: http
       - service: db
-        host: sandbox-db.hostbo.cx
-        port: 5434
+        host: sandbox-db.relay
+        port: 5432
         target: pg
+        proxy: tcp
